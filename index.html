@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #fff;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            text-align: center;
+            color: #ffa500;
+        }
+
+        .egg-container {
+            width: 200px;
+            height: 200px;
+            margin: auto;
+        }
+
+        .egg-container img {
+            width: 100%;
+            height: auto;
+        }
+
+        #timer {
+            font-size: 2em;
+            margin: 20px 0;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .timer-button, .control-button {
+            padding: 10px 20px;
+            font-size: 1em;
+            border: 2px solid #ffa500;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #ffa500;
+            cursor: pointer;
+        }
+
+        .timer-button:hover, .control-button:hover {
+            background-color: #ffa500;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="egg-container">
+            <img id="egg" src="images/egg1.png" alt="Egg">
+        </div>
+        <div id="timer">00:00</div>
+        <div class="buttons">
+            <button class="timer-button" onclick="addTime(10)">10:00</button>
+            <button class="timer-button" onclick="addTime(25)">25:00</button>
+            <button class="timer-button" onclick="addTime(45)">45:00</button>
+            <button class="control-button" onclick="pauseTimer()">Pause</button>
+            <button class="control-button" onclick="stopTimer()">Stop</button>
+        </div>
+    </div>
+    <audio id="beep" src="sounds/beep.mp3"></audio>
+    <script>
+        let timer;
+        let totalTime = 0;
+        let remainingTime = 0;
+        let interval;
+        let eggImages = [
+            'images/egg1.png',
+            'images/egg2.png',
+            'images/egg3.png',
+            'images/egg4.png',
+            'images/egg5.png',
+            'images/egg6.png'
+        ];
+        let currentEggStage = 0;
+
+        function updateTimer() {
+            remainingTime--;
+            if (remainingTime < 0) {
+                clearInterval(interval);
+                document.getElementById('beep').play();
+                document.getElementById('egg').src = eggImages[5];
+                return;
+            }
+            let minutes = Math.floor(remainingTime / 60);
+            let seconds = remainingTime % 60;
+            document.getElementById('timer').innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            updateEgg();
+        }
+
+        function updateEgg() {
+            let stage = Math.floor(((totalTime - remainingTime) / totalTime) * 5);
+            if (stage > currentEggStage) {
+                currentEggStage = stage;
+                document.getElementById('egg').src = eggImages[stage];
+            }
+        }
+
+        function addTime(minutes) {
+            totalTime += minutes * 60;
+            remainingTime = totalTime;
+            if (interval) clearInterval(interval);
+            interval = setInterval(updateTimer, 1000);
+        }
+
+        function pauseTimer() {
+            clearInterval(interval);
+        }
+
+        function stopTimer() {
+            clearInterval(interval);
+            totalTime = 0;
+            remainingTime = 0;
+            document.getElementById('timer').innerText = '00:00';
+            document.getElementById('egg').src = eggImages[0];
+            currentEggStage = 0;
+        }
+    </script>
+</body>
+</html>
